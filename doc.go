@@ -39,10 +39,11 @@
 //The following additional functions are defined:
 //
 //	readCSV headerspec filename
-//headerspec is a comma-separated list of headers or "" to use the headers
-//in filename.
-//Dot is set to the contents of the CSV file as with -csv.
-//If the file cannot be opened or its contents are malformed, execution stops.
+//		headerspec is a comma-separated list of headers or "" to use the headers
+//		in filename.
+//		Dot is set to the contents of the CSV file as with -csv.
+//		If the file cannot be opened or its contents are malformed, execution
+//		stops.
 //
 //	readJSON filename
 //		Read the JSON encoded file into dot or halt execution if decoding fails

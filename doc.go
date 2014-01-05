@@ -54,7 +54,7 @@
 //		Read filename with the default record and file splitting as specified
 //		by the RS and FS regular expressions.
 //
-//	quote-csv string
+//	quoteCSV string
 //		Apply the appropriate CSV quoting rules to string.
 //
 //	toJSON what

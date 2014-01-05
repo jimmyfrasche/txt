@@ -70,7 +70,7 @@ var funcs = template.FuncMap{
 		}
 		return Split(RS, FS, f)
 	},
-	"quote-csv": func(s string) string {
+	"quoteCSV": func(s string) string {
 		hasQuote := strings.Index(s, `"`) > 0
 		hasComma := strings.Index(s, ",") > 0
 		if hasComma && !hasQuote {

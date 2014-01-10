@@ -22,6 +22,8 @@
 //The templating language is documented at http://golang.org/pkg/text/template
 //with the single difference that if the first line at the top of the file
 //begins with #! that line is skipped.
+//If the -html flag is used, escaping functions are automatically added to all
+//outputs based on context.
 //
 //Any command line arguments after the flags are treated as filenames
 //of templates.

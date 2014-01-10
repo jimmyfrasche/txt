@@ -9,7 +9,6 @@ import (
 	"os/exec"
 	"regexp"
 	"strings"
-	"text/template"
 )
 
 func swapArgs(f func(string, string) string) func(string, string) string {
@@ -39,7 +38,7 @@ func run(c *exec.Cmd) string {
 	return out.String()
 }
 
-var funcs = template.FuncMap{
+var funcs = map[string]interface{}{
 	"readCSV": func(header, file string) (interface{}, error) {
 		f, err := os.Open(file)
 		if err != nil {

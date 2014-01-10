@@ -12,6 +12,7 @@ var (
 	Right      = flag.String("right", "}}", "set right template delimiter")
 	Template   = flag.String("template", "", "which template to invoke, otherwise first listed")
 	Expression = flag.String("e", "", "expression to use as main template")
+	Html       = flag.Bool("html", false, "use html-aware automatic escaping against code injection")
 
 	FieldSeparator  = flag.String("F", "[ \t]+", "field separator, RE2 regexp")
 	RecordSeparator = flag.String("R", "\n+", "record separator, RE2 regexp")
@@ -47,7 +48,7 @@ func main() {
 	} else {
 		log.Fatalln("No template(s) specified")
 	}
-	tmpl, err := Parse(*Expression, *Left, *Right, funcs, args...)
+	tmpl, err := Parse(*Html, *Expression, *Left, *Right, funcs, args...)
 	if err != nil {
 		log.Fatalln(err)
 	}

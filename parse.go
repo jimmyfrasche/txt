@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"io/ioutil"
 	"path/filepath"
-	"text/template"
 )
 
 var shebang = []byte("#!")
 
-func Parse(e, left, right string, fs template.FuncMap, files ...string) (t *template.Template, err error) {
+func Parse(usehtml bool, e, left, right string, fs map[string]interface{}, files ...string) (t template, err error) {
+	new := htmlOrText[usehtml]
 	if e != "" {
-		t = template.New("").Funcs(fs).Delims(left, right)
+		t = new("", left, right, fs)
 		if t, err = t.Parse(e); err != nil {
 			return nil, err
 		}
@@ -33,9 +33,9 @@ func Parse(e, left, right string, fs template.FuncMap, files ...string) (t *temp
 
 		name := filepath.Base(file)
 
-		var tmpl *template.Template
+		var tmpl template
 		if t == nil {
-			t = template.New(name).Funcs(fs).Delims(left, right)
+			t = new(name, left, right, fs)
 			tmpl = t
 		} else {
 			tmpl = t.New(name)

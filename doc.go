@@ -45,6 +45,13 @@
 //If the -e flag is used to define an inline template, it is always the main
 //template, and the -template flag is illegal.
 //
+//Regular Expressions
+//
+//All regular expressions are RE2 regular expression with the Perl syntax and
+//semantics.
+//The syntax is documented at
+//http://golang.org/pkg/regexp/syntax/#hdr-Syntax
+//
 //Functions
 //
 //Built in functions are documented at

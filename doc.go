@@ -58,6 +58,7 @@
 //	read RS FS filename
 //		Read filename with the default record and file splitting as specified
 //		by the RS and FS regular expressions.
+//		If RS or FS are "", the respective value of -R or -F is used.
 //
 //	quoteCSV string
 //		Apply the appropriate CSV quoting rules to string.

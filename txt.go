@@ -17,9 +17,10 @@ var (
 	FieldSeparator  = flag.String("F", "[ \t]+", "field separator, RE2 regexp")
 	RecordSeparator = flag.String("R", "\n+", "record separator, RE2 regexp")
 
-	Json   = flag.Bool("json", false, "treat input as JSON")
-	Csv    = flag.Bool("csv", false, "treat input as CSV")
-	Header = flag.String("csv-header", "", "specify a header for the CSV, instead of the first row. -csv is assumed if -csv-header is used.")
+	Json    = flag.Bool("json", false, "treat input as JSON")
+	Csv     = flag.Bool("csv", false, "treat input as CSV")
+	NoStdin = flag.Bool("no-stdin", false, "do not read stdin")
+	Header  = flag.String("csv-header", "", "specify a header for the CSV, instead of the first row. -csv is assumed if -csv-header is used.")
 )
 
 //Usage: %name %flags template-files*
@@ -63,7 +64,7 @@ func main() {
 		stdin, err = CSV(hdr, os.Stdin)
 	} else if *Json {
 		stdin, err = JSON(os.Stdin)
-	} else {
+	} else if !*NoStdin {
 		stdin, err = Split(*RecordSeparator, *FieldSeparator, os.Stdin)
 	}
 	if err != nil {

@@ -3,7 +3,7 @@
 //Input
 //
 //The input to the template comes from stdin.
-//It is parsed in one of three ways.
+//It is parsed in one of four ways.
 //
 //The default is to split stdin into records and fields, using the -R and -F
 //flags respectively, similar to awk(1), and dot is set to a list of lists
@@ -16,6 +16,9 @@
 //
 //If the -json flag is specified, stdin is treated as JSON.
 //Dot is set as the decoded JSON.
+//
+//If the -no-stdin flag is specified, stdin is not read.
+//Dot is not set.
 //
 //Templates
 //

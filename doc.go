@@ -27,7 +27,7 @@
 //
 //Any command line arguments after the flags are treated as filenames
 //of templates.
-//The templates are named after the respective filename.
+//The templates are named after the basename of the respective filename.
 //The first file listed is the main template, unless the -template flag
 //specifies otherwise.
 //If the -e flag is used to define an inline template, it is always the main

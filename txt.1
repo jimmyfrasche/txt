@@ -17,6 +17,8 @@ txt \- Command txt is a templating language for shell programming.
 .IR FieldSeparator ]
 .RB [ \-R
 .IR RecordSeparator ]
+.RB [ \-L
+.IR LinePattern ]
 .RB [ \-json ]
 .RB [ \-csv ]
 .RB [ \-no-stdin ]
@@ -27,13 +29,25 @@ txt \- Command txt is a templating language for shell programming.
 Input 
 .PP
 The input to the template comes from stdin. 
-It is parsed in one of four ways. 
+It is parsed in one of five ways. 
 .PP
 The default is to split stdin into records and fields, using the 
 .B \-R
 and 
 .B \-F
 flags respectively, similar to awk(1), and dot is set to a list of lists of string. 
+.PP
+If the 
+.B \-L
+flag is specified stdin is broken into records as with the default, but the fields are defined by the capture groups of the regular expression 
+.B \-L.
+Records that do not match 
+.B \-L
+are skipped. 
+If 
+.B \-L
+contains named capture groups each record is a dictionary of only the named captures' values for that record. 
+Otherwise, the record is a list of the capture groups' values for that record. 
 .PP
 If the 
 .B \-csv
@@ -104,6 +118,17 @@ Read the JSON encoded file into dot or halt execution if decoding fails
 or the file cannot be opened.
 .sp 0
 Dot is set to the contents of the JSON file as with \-json.
+.sp 0
+.sp
+.RE
+readLine FS LP filename
+.sp 0
+.RS
+Read filename with line pattern splitting as specified by the RS and
+.sp 0
+LP regular expressions.
+.sp 0
+If RS or LP are "", the respective value of \-R or \-L is used.
 .sp 0
 .sp
 .RE
@@ -314,6 +339,9 @@ field separator, RE2 regexp
 .BR "\-R " RecordSeparator " = 
 +"
 record separator, RE2 regexp 
+.TP
+.BR "\-L " LinePattern
+line pattern, RE2 regexp 
 .TP
 .BR "\-json "
 treat input as JSON 

@@ -11,11 +11,20 @@ Command txt is a templating language for shell programming.
 
 ##Input
 The input to the template comes from stdin.
-It is parsed in one of four ways.
+It is parsed in one of five ways.
 
 The default is to split stdin into records and fields, using the -R and -F
 flags respectively, similar to awk(1), and dot is set to a list of lists
 of string.
+
+If the -L flag is specified stdin is broken into records as with the default,
+but the fields are defined by the capture groups of the regular expression
+-L.
+Records that do not match -L are skipped.
+If -L contains named capture groups each record is a dictionary of only
+the named captures' values for that record.
+Otherwise, the record is a list of the capture groups' values for that
+record.
 
 If the -csv flag, or the -header flag, is specified, stdin is treated as
 a CSV file, as recognized by the encoding/csv package.
@@ -61,6 +70,11 @@ readJSON filename
 	Read the JSON encoded file into dot or halt execution if decoding fails
 	or the file cannot be opened.
 	Dot is set to the contents of the JSON file as with -json.
+
+readLine FS LP filename
+	Read filename with line pattern splitting as specified by the RS and
+	LP regular expressions.
+	If RS or LP are "", the respective value of -R or -L is used.
 
 read RS FS filename
 	Read filename with the default record and file splitting as specified

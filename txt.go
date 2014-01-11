@@ -16,6 +16,7 @@ var (
 
 	FieldSeparator  = flag.String("F", "[ \t]+", "field separator, RE2 regexp")
 	RecordSeparator = flag.String("R", "\n+", "record separator, RE2 regexp")
+	LinePattern     = flag.String("L", "", "line pattern, RE2 regexp")
 
 	Json    = flag.Bool("json", false, "treat input as JSON")
 	Csv     = flag.Bool("csv", false, "treat input as CSV")
@@ -64,6 +65,8 @@ func main() {
 		stdin, err = CSV(hdr, os.Stdin)
 	} else if *Json {
 		stdin, err = JSON(os.Stdin)
+	} else if *LinePattern != "" {
+		stdin, err = SubmatchSplit(*RecordSeparator, *LinePattern, os.Stdin)
 	} else if !*NoStdin {
 		stdin, err = Split(*RecordSeparator, *FieldSeparator, os.Stdin)
 	}

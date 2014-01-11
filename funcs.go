@@ -55,6 +55,20 @@ var funcs = map[string]interface{}{
 		defer f.Close()
 		return JSON(f)
 	},
+	"readLine": func(RS, LP, file string) (interface{}, error) {
+		f, err := os.Open(file)
+		if err != nil {
+			return nil, err
+		}
+		defer f.Close()
+		if RS == "" {
+			RS = *RecordSeparator
+		}
+		if LP == "" {
+			LP = *LinePattern
+		}
+		return SubmatchSplit(RS, LP, f)
+	},
 	"read": func(RS, FS, file string) (interface{}, error) {
 		f, err := os.Open(file)
 		if err != nil {

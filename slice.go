@@ -43,7 +43,7 @@ func SubmatchSplit(RS, LinePattern string, Stdin io.Reader) (ret interface{}, er
 	if len(names) > 0 {
 		//if there are named submatches build the row as a map with just the named entries.
 		//multiple names are by construction the value of the last name.
-		out := make([]map[string]string, 0, len(pairs))
+		out := make([]map[string]string, 0, len(pairs)+1)
 		for _, p := range invert.Indicies(pairs, len(stdin)) {
 			if sms := lp.FindSubmatch(stdin[p[0]:p[1]]); sms != nil {
 				row := map[string]string{}
@@ -57,7 +57,7 @@ func SubmatchSplit(RS, LinePattern string, Stdin io.Reader) (ret interface{}, er
 		ret = out
 	} else {
 		//if there are no named submatches, build the row much like Split.
-		out := make([][]string, 0, len(pairs))
+		out := make([][]string, 0, len(pairs)+1)
 		for _, p := range invert.Indicies(pairs, len(stdin)) {
 			if sms := lp.FindSubmatch(stdin[p[0]:p[1]]); sms != nil {
 				row := make([]string, 0, len(sms))
@@ -90,7 +90,7 @@ func Split(RS, FS string, Stdin io.Reader) (interface{}, error) {
 	}
 
 	pairs := rs.FindAllIndex(stdin, -1)
-	out := make([][]string, 0, len(pairs))
+	out := make([][]string, 0, len(pairs)+1)
 	for _, p := range invert.Indicies(pairs, len(stdin)) {
 		s := stdin[p[0]:p[1]]
 

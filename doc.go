@@ -6,8 +6,9 @@
 //It is parsed in one of five ways.
 //
 //The default is to split stdin into records and fields, using the -R and -F
-//flags respectively, similar to awk(1), and dot is set to a list of lists
-//of string.
+//flags respectively, similar to awk(1), and dot is set to a list of records
+//(see below).
+//If header is set, dot is a list of maps with the specified names as keys.
 //
 //If the -L flag is specified stdin is broken into records as with the default,
 //but the fields are defined by the capture groups of the regular expression
@@ -15,11 +16,12 @@
 //Records that do not match -L are skipped.
 //If -L contains named capture groups each record is a dictionary of only
 //the named captures' values for that record.
-//Otherwise, the record is a list of the capture groups' values for that
-//record.
+//Otherwise, dot is a list of records (see below) of the capture groups' values.
+//If header is set, dot is a list of maps with the specified names as keys,
+//overriding any names from capture groups.
 //
-//If the -csv flag, or the -header flag, is specified, stdin is treated as
-//a CSV file, as recognized by the encoding/csv package.
+//If the -csv flag is specified, stdin is treated as a CSV file, as recognized
+//by the encoding/csv package.
 //If the -header flag is not specified, the first record is used as the header.
 //Dot is set to a list of maps, with the header for each column as the key.
 //
@@ -28,6 +30,27 @@
 //
 //If the -no-stdin flag is specified, stdin is not read.
 //Dot is not set.
+//
+//Records
+//
+//When using -F or -L without a header, or in the case of -L without named
+//capture groups, dot is a list of records.
+//
+//Each record has two fields, Fields and Line.
+//Line is the complete unaltered input of that record.
+//Fields are the values of each field in that record.
+//If dot is a record
+//	{{.}}
+//is the same as
+//	{{.Line}}
+//Records have a method F that takes an integer n and returns the nth field
+//if it exists and the empty string otherwise.
+//If n is negative it returns the (n-1)th field from the end.
+//
+//If n is positive and the nth field exists, then
+//	{{.F n}}
+//is equivalent to
+//	{{index . n}}
 //
 //Templates
 //
@@ -72,15 +95,21 @@
 //		Dot is set to the contents of the JSON file as with -json.
 //
 //
-//	readLine FS LP filename
+//	readLine header FS LP filename
 //		Read filename with line pattern splitting as specified by the RS and
-//		LP regular expressions.
+//		LP regular expressions, and an optional header header.
+//		If header is not "", the names in header will be used as the field names.
 //		If RS or LP are "", the respective value of -R or -L is used.
 //
-//	read RS FS filename
+//	read header RS FS filename
 //		Read filename with the default record and file splitting as specified
-//		by the RS and FS regular expressions.
+//		by the RS and FS regular expressions, and optional header header.
+//		If header is not "", the names in header will be used as the field names.
 //		If RS or FS are "", the respective value of -R or -F is used.
+//
+//	readFile filename
+//		Read filename completely as a single string.
+//		Execution halts if the file cannot be read.
 //
 //	quoteCSV string
 //		Apply the appropriate CSV quoting rules to string.
@@ -88,10 +117,6 @@
 //	toJSON what
 //		Encode what as JSON. Execution halts if
 //		http://golang.org/pkg/encoding/json/#Marshal errors.
-//
-//	readFile filename
-//		Read filename completely as a single string.
-//		Execution halts if the file cannot be read.
 //
 //	equalFold string-one string-two
 //		Reports whether the UTF-8 encoded string-one and string-two are equal

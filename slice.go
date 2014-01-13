@@ -11,15 +11,35 @@ import (
 	"github.com/jimmyfrasche/invert"
 )
 
-func SubmatchSplit(RS, LinePattern string, Stdin io.Reader) (ret interface{}, err error) {
+type record struct {
+	Fields []string
+	Line   string
+}
+
+func (r *record) F(n int) string {
+	ln := len(r.Fields)
+	if n < 0 {
+		n = ln + n
+	}
+	if n < 0 || n >= ln {
+		return ""
+	}
+	return r.Fields[n]
+}
+
+func (r *record) String() string {
+	return r.Line
+}
+
+func SubmatchSplit(header []string, RS, LinePattern string, Stdin io.Reader) (ret interface{}, err error) {
 	rs, err := cmpl(RS) //might as well add these to the cache
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	lp, err := cmpl(LinePattern)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	//code loosely based on but entirely inspired by rsc's reply to
@@ -27,28 +47,35 @@ func SubmatchSplit(RS, LinePattern string, Stdin io.Reader) (ret interface{}, er
 	if lp.NumSubexp() < 1 {
 		return nil, errors.New("submatch splitting requires a regexp with submatches")
 	}
-	names := map[string]int{}
-	for i, name := range lp.SubexpNames() {
-		if name != "" {
-			names[name] = i
+	names := hdr2map(header, true)
+	if len(names) == 0 {
+		for i, name := range lp.SubexpNames() {
+			if name != "" {
+				names[name] = i
+			}
 		}
 	}
 
 	stdin, err := ioutil.ReadAll(Stdin)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	pairs := rs.FindAllIndex(stdin, -1)
+	records := invert.Indicies(pairs, len(stdin))
 	if len(names) > 0 {
 		//if there are named submatches build the row as a map with just the named entries.
 		//multiple names are by construction the value of the last name.
-		out := make([]map[string]string, 0, len(pairs)+1)
-		for _, p := range invert.Indicies(pairs, len(stdin)) {
+		out := make([]map[string]string, 0, len(records))
+		for _, p := range records {
 			if sms := lp.FindSubmatch(stdin[p[0]:p[1]]); sms != nil {
-				row := map[string]string{}
+				row := make(map[string]string, len(names))
 				for name, i := range names {
-					row[name] = string(sms[i])
+					if i < len(sms) {
+						row[name] = string(sms[i])
+					} else {
+						row[name] = ""
+					}
 				}
 				out = append(out, row)
 			}
@@ -56,15 +83,18 @@ func SubmatchSplit(RS, LinePattern string, Stdin io.Reader) (ret interface{}, er
 		}
 		ret = out
 	} else {
-		//if there are no named submatches, build the row much like Split.
-		out := make([][]string, 0, len(pairs)+1)
-		for _, p := range invert.Indicies(pairs, len(stdin)) {
-			if sms := lp.FindSubmatch(stdin[p[0]:p[1]]); sms != nil {
-				row := make([]string, 0, len(sms))
-				for _, sm := range sms {
+		out := make([]*record, 0, len(records))
+		for _, p := range records {
+			line := stdin[p[0]:p[1]]
+			if sms := lp.FindSubmatch(line); sms != nil {
+				row := make([]string, 0, len(sms)-1)
+				for _, sm := range sms[1:] {
 					row = append(row, string(sm))
 				}
-				out = append(out, row)
+				out = append(out, &record{
+					Fields: row,
+					Line:   string(line),
+				})
 			}
 		}
 		ret = out
@@ -73,39 +103,68 @@ func SubmatchSplit(RS, LinePattern string, Stdin io.Reader) (ret interface{}, er
 	return
 }
 
-func Split(RS, FS string, Stdin io.Reader) (interface{}, error) {
+func Split(header []string, RS, FS string, Stdin io.Reader) (ret interface{}, err error) {
 	rs, err := cmpl(RS)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	fs, err := cmpl(FS)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	stdin, err := ioutil.ReadAll(Stdin)
 	if err != nil {
-		return nil, err
+		return
 	}
+
+	names := hdr2map(header, false)
 
 	pairs := rs.FindAllIndex(stdin, -1)
-	out := make([][]string, 0, len(pairs)+1)
-	for _, p := range invert.Indicies(pairs, len(stdin)) {
-		s := stdin[p[0]:p[1]]
+	records := invert.Indicies(pairs, len(stdin))
+	if len(names) > 0 {
+		out := make([]map[string]string, 0, len(records))
+		for _, p := range records {
+			s := stdin[p[0]:p[1]]
 
-		is := fs.FindAllIndex(s, -1)
-		is = invert.Indicies(is, len(s))
+			is := fs.FindAllIndex(s, -1)
+			is = invert.Indicies(is, len(s))
 
-		row := make([]string, 0, len(is))
-		for _, i := range is {
-			row = append(row, string(s[i[0]:i[1]]))
+			row := make(map[string]string, len(names))
+			for name, i := range names {
+				if i < len(is) {
+					ix := is[i]
+					row[name] = string(s[ix[0]:ix[1]])
+				} else {
+					row[name] = ""
+				}
+			}
+			out = append(out, row)
 		}
+		ret = out
+	} else {
+		out := make([]*record, 0, len(records))
+		for _, p := range records {
+			s := stdin[p[0]:p[1]]
 
-		out = append(out, row)
+			is := fs.FindAllIndex(s, -1)
+			is = invert.Indicies(is, len(s))
+
+			row := make([]string, 0, len(is))
+			for _, ix := range is {
+				row = append(row, string(s[ix[0]:ix[1]]))
+			}
+
+			out = append(out, &record{
+				Fields: row,
+				Line:   string(s),
+			})
+		}
+		ret = out
 	}
 
-	return out, nil
+	return
 }
 
 func CSV(header []string, Stdin io.Reader) (interface{}, error) {

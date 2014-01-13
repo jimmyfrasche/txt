@@ -1,42 +1,13 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"regexp"
 	"strings"
 )
-
-func swapArgs(f func(string, string) string) func(string, string) string {
-	return func(a, b string) string {
-		return f(b, a)
-	}
-}
-
-var rc = map[string]*regexp.Regexp{}
-
-func cmpl(p string) (*regexp.Regexp, error) {
-	if r, ok := rc[p]; ok {
-		return r, nil
-	}
-	r, err := regexp.Compile(p)
-	if err != nil {
-		return nil, err
-	}
-	rc[p] = r
-	return r, nil
-}
-
-func run(c *exec.Cmd) string {
-	var out bytes.Buffer
-	c.Stdout = &out
-	_ = c.Run()
-	return out.String()
-}
 
 var funcs = map[string]interface{}{
 	"readCSV": func(header, file string) (interface{}, error) {
@@ -55,7 +26,7 @@ var funcs = map[string]interface{}{
 		defer f.Close()
 		return JSON(f)
 	},
-	"readLine": func(RS, LP, file string) (interface{}, error) {
+	"readLine": func(RS, LP, header, file string) (interface{}, error) {
 		f, err := os.Open(file)
 		if err != nil {
 			return nil, err
@@ -67,9 +38,10 @@ var funcs = map[string]interface{}{
 		if LP == "" {
 			LP = *LinePattern
 		}
-		return SubmatchSplit(RS, LP, f)
+		hdr := splitHeader(header)
+		return SubmatchSplit(hdr, RS, LP, f)
 	},
-	"read": func(RS, FS, file string) (interface{}, error) {
+	"read": func(RS, FS, header, file string) (interface{}, error) {
 		f, err := os.Open(file)
 		if err != nil {
 			return nil, err
@@ -81,7 +53,8 @@ var funcs = map[string]interface{}{
 		if FS == "" {
 			FS = *FieldSeparator
 		}
-		return Split(RS, FS, f)
+		hdr := splitHeader(header)
+		return Split(hdr, RS, FS, f)
 	},
 	"quoteCSV": func(s string) string {
 		hasQuote := strings.Index(s, `"`) > 0

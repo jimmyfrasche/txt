@@ -138,9 +138,15 @@ var funcs = map[string]interface{}{
 		return s
 	},
 
-	"toJSON": json.Marshal,
+	"toJSON": func(v interface{}) (string, error) {
+		bs, err := json.Marshal(v)
+		return string(bs), err
+	},
 
-	"readFile": ioutil.ReadFile,
+	"readFile": func(f string) (string, error) {
+		bs, err := ioutil.ReadFile(f)
+		return string(bs), err
+	},
 
 	"equalFold": strings.EqualFold,
 	"fields":    strings.Fields,

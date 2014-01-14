@@ -145,7 +145,7 @@
 //	title string
 //		Titlecase string.
 //
-//	trim cutset string
+//	trimCutset cutset string
 //		Return string with all leading and trailing runes in cutset removed.
 //
 //	trimLeft cutset string
@@ -160,7 +160,7 @@
 //	trimSuffix suffix string
 //		Return string with suffix removed.
 //
-//	trimSpace string
+//	trim string
 //		Return string with all leading and trailing whitespace removed.
 //
 //	quoteGo string

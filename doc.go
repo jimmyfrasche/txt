@@ -82,6 +82,15 @@
 //
 //The following additional functions are defined:
 //
+//	slice what start stop
+//		slices what from start to stop.
+//		stop is optional. what must be a list or string.
+//		start or stop may be negative. If start or stop exceed the bounds
+//		of what, the largest slice of what that exists is returned.
+//
+//	nl string
+//		append a newline to the end of string, if it does not end in newline.
+//
 //	readCSV headerspec filename
 //		headerspec is a comma-separated list of headers or "" to use the headers
 //		in filename.
@@ -93,7 +102,6 @@
 //		Read the JSON encoded file into dot or halt execution if decoding fails
 //		or the file cannot be opened.
 //		Dot is set to the contents of the JSON file as with -json.
-//
 //
 //	readLine header FS LP filename
 //		Read filename with line pattern splitting as specified by the RS and
@@ -154,6 +162,14 @@
 //
 //	trimSpace string
 //		Return string with all leading and trailing whitespace removed.
+//
+//	quoteGo string
+//		Return string quoted as a Go string literal. Escapes non-printable
+//		runes. Should work for most languages that accept UTF-8 source.
+//
+//	quoteGoASCII string
+//		As quoteGo except any non-ASCII runes are escaped to hexcodes.
+//		Should work for most languages.
 //
 //	match pattern string
 //		Return whether string matches the regex in pattern.

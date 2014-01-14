@@ -2,10 +2,32 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"os/exec"
+	"reflect"
 	"regexp"
 	"strings"
 )
+
+var intSize = reflect.ValueOf(0)
+
+func overflow(i int64) (int, error) {
+	if intSize.OverflowInt(i) {
+		return 0, fmt.Errorf("%d cannot be used as index on 32bit systems")
+	}
+	return int(i), nil
+}
+
+func index(index interface{}) (x int, err error) {
+	switch v := reflect.ValueOf(index); v.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return overflow(v.Int())
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return overflow(int64(v.Uint()))
+	default:
+		return 0, fmt.Errorf("can't use type %s as index", v.Type())
+	}
+}
 
 func swapArgs(f func(string, string) string) func(string, string) string {
 	return func(a, b string) string {

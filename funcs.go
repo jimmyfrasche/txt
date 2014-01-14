@@ -41,7 +41,7 @@ var funcs = map[string]interface{}{
 		}
 
 		if start == stop {
-			return v.Slice(0, 0), nil
+			return v.Slice(0, 0).Interface(), nil
 		}
 
 		if usestop && start < 0 && stop < 0 {
@@ -63,7 +63,7 @@ var funcs = map[string]interface{}{
 			if usestop {
 				return nil, fmt.Errorf("invalid indicies (%d, %d)", start, stop)
 			} else {
-				return v.Slice(0, 0), nil
+				return v.Slice(0, 0).Interface(), nil
 			}
 		}
 
@@ -72,7 +72,7 @@ var funcs = map[string]interface{}{
 			stop = ln
 		}
 
-		return v.Slice(start, stop), nil
+		return v.Slice(start, stop).Interface(), nil
 	},
 	"nl": func(s string) string {
 		if len(s) == 0 || s[len(s)-1] == '\n' {

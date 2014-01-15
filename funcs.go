@@ -80,28 +80,14 @@ var funcs = map[string]interface{}{
 		}
 		return s + "\n"
 	},
-	"readCSV": func(header, file string) (interface{}, error) {
-		f, err := os.Open(file)
-		if err != nil {
-			return nil, err
-		}
-		defer f.Close()
-		return CSV(strings.Split(header, ","), f)
+	"parseCSV": func(header, input string) (interface{}, error) {
+		hdr := splitHeader(header)
+		return CSV(hdr, rdr(input))
 	},
-	"readJSON": func(file string) (interface{}, error) {
-		f, err := os.Open(file)
-		if err != nil {
-			return nil, err
-		}
-		defer f.Close()
-		return JSON(f)
+	"parseJSON": func(input string) (interface{}, error) {
+		return JSON(rdr(input))
 	},
-	"readLine": func(RS, LP, header, file string) (interface{}, error) {
-		f, err := os.Open(file)
-		if err != nil {
-			return nil, err
-		}
-		defer f.Close()
+	"parseLine": func(RS, LP, header, input string) (interface{}, error) {
 		if RS == "" {
 			RS = *RecordSeparator
 		}
@@ -109,14 +95,9 @@ var funcs = map[string]interface{}{
 			LP = *LinePattern
 		}
 		hdr := splitHeader(header)
-		return SubmatchSplit(hdr, RS, LP, f)
+		return SubmatchSplit(hdr, RS, LP, rdr(input))
 	},
-	"read": func(RS, FS, header, file string) (interface{}, error) {
-		f, err := os.Open(file)
-		if err != nil {
-			return nil, err
-		}
-		defer f.Close()
+	"parse": func(RS, FS, header, input string) (interface{}, error) {
 		if RS == "" {
 			RS = *RecordSeparator
 		}
@@ -124,7 +105,7 @@ var funcs = map[string]interface{}{
 			FS = *FieldSeparator
 		}
 		hdr := splitHeader(header)
-		return Split(hdr, RS, FS, f)
+		return Split(hdr, RS, FS, rdr(input))
 	},
 	"quoteCSV": func(s string) string {
 		hasQuote := strings.Index(s, `"`) > 0
@@ -143,14 +124,14 @@ var funcs = map[string]interface{}{
 		return string(bs), err
 	},
 
-	"readFile": func(f string) (string, error) {
+	"read": func(f string) (string, error) {
 		bs, err := ioutil.ReadFile(f)
 		return string(bs), err
 	},
 
 	"equalFold": strings.EqualFold,
 	"fields":    strings.Fields,
-	"Join": func(sep string, a []string) string {
+	"join": func(sep string, a []string) string {
 		return strings.Join(a, sep)
 	},
 	"lower":      strings.ToLower,

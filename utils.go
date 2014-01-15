@@ -3,11 +3,16 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os/exec"
 	"reflect"
 	"regexp"
 	"strings"
 )
+
+func rdr(corpus string) io.Reader {
+	return strings.NewReader(corpus)
+}
 
 var intSize = reflect.ValueOf(0)
 

@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"sort"
-	"strings"
 	"testing"
 )
 
@@ -80,10 +78,6 @@ func failIf(t *testing.T, testno int, err error) {
 	if err != nil {
 		t.Errorf("test case %d: %s", testno, err)
 	}
-}
-
-func rdr(corpus string) io.Reader {
-	return strings.NewReader(corpus)
 }
 
 //TEST SPLIT

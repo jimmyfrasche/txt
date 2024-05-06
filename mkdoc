@@ -1,3 +1,0 @@
-#!/bin/sh
-mango >txt.1
-autoreadme -f

@@ -18,7 +18,7 @@ var intSize = reflect.ValueOf(0)
 
 func overflow(i int64) (int, error) {
 	if intSize.OverflowInt(i) {
-		return 0, fmt.Errorf("%d cannot be used as index on 32bit systems")
+		return 0, fmt.Errorf("%d cannot be used as index on 32bit systems", i)
 	}
 	return int(i), nil
 }

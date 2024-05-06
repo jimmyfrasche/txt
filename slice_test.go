@@ -60,7 +60,7 @@ func listMapEquals(a, b []map[string]string) error {
 	for i := range a {
 		ai, bi := a[i], b[i]
 		if la, lb := len(ai), len(bi); la != lb {
-			return fmt.Errorf("record %d: wrong number of fields: %d ≠ %d", la, lb)
+			return fmt.Errorf("record %d: wrong number of fields: %d ≠ %d", i, la, lb)
 		}
 		aki, avi := keyValues(ai)
 		bki, bvi := keyValues(bi)
